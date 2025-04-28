@@ -1,0 +1,28 @@
+# PlatformIO build folder
+.pio/
+
+# PlatformIO IDE settings
+.vscode/
+.idea/
+.clang_complete
+.ccls-cache/
+*.code-workspace
+
+# Compiled binary files
+*.elf
+*.bin
+*.hex
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Arduino backup files
+*.bak
+*.tmp
+*.swp
+*.swo
+*.d
+
+# Environment-specific files
+*.env
