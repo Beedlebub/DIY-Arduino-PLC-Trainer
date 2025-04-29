@@ -1,7 +1,12 @@
 # plcTrainer_Uno
-## Trainer Photo
+## Trainer Setup
+
+This photo shows the current trainer hardware built for Phase 2 development and testing.
+
+The setup includes an Arduino Uno, breadboard with labeled start/stop/fault buttons, NeoPixel status LED, piezo buzzer, relay module, and a buck converter for power management — all mounted on a 3D-printed frame.
 
 ![PLC Trainer Setup](docs/plcTrainer_setup.jpg)
+
 
 
 **Phase 2 Final Release**
