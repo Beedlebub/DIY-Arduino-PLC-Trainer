@@ -1,4 +1,8 @@
 # plcTrainer_Uno
+## Trainer Photo
+
+![PLC Trainer Setup](docs/plcTrainer_setup.jpg)
+
 
 **Phase 2 Final Release**
 
