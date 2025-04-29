@@ -1,112 +1,135 @@
 # plcTrainer_Uno
 
-**Phase 2 Final Version:** Beginner-Friendly Motor Controller Simulation for Arduino Uno.
-
-This project simulates an industrial-style Start/Stop/Fault machine controller using **physical buttons**, a **NeoPixel LED**, and a **piezo buzzer** — built with modern C++ structure (PlatformIO + VSCode ready).
+**Phase 2 Final Release**
 
 ---
 
-## 🚀 Features
+## Overview
 
-✅ 3 Button Inputs:
-- **Start Motor**
-- **Stop Motor**
-- **Fault Injection**
+This project simulates a basic industrial motor control system using an Arduino Uno.
+It uses physical buttons, a NeoPixel LED, and a piezo buzzer to represent machine states like **Stopped**, **Running**, and **Fault**.
 
-✅ NeoPixel LED Feedback:
-- 🔴 Solid Red = Stopped
-- 🟢 Solid Green = Running
-- 🟡 Flashing Yellow = Holding button
-- 🔴 Fast Flashing Red = Active Fault
-- 🔴 Slow Flashing Red = Fault Clearing in progress
-
-✅ Piezo Buzzer Feedback:
-- 1 beep → Start success
-- 2 beeps → Stop success or Fault cleared
-- 3 beeps → Fault occurred (including on power-up if fault persisted)
-
-✅ EEPROM Fault Recovery
-- Reboots back into FAULT if shut down during fault state
-
-✅ Debounced Button Handling (non-blocking using `millis()`)
-
-✅ Clean C++ Structure:
-- `LedController` class
-- `BuzzerController` class
-
-✅ PlatformIO Native Build Support (no Arduino IDE needed)
+User input requires **button holds** to validate intent, mimicking real-world industrial safety logic.
+The project is designed using **simple C++ classes** for LED and Buzzer management, while keeping the main logic easily understandable.
 
 ---
 
-## 🛠️ Hardware Requirements
+## Features
 
-| Component                      | Notes                                |
-|:--------------------------------|:-------------------------------------|
-| Arduino Uno (or compatible)     | AVR-based board |
-| NeoPixel Single LED             | Connect to D7 |
-| Piezo Buzzer                    | Connect to D8 |
-| Start/Stop/Fault Buttons        | Connect to D4/D3/D2 respectively |
-| 10K Pull-up Resistors (optional) | Internal pull-ups enabled |
-| Common Ground                   | Required for all components |
+- **3 Buttons**:
+  - **Start Motor** Button
+  - **Stop Motor** Button
+  - **Fault Simulation** Button
 
----
+- **NeoPixel LED Visual Feedback**:
+  - Solid Red: Machine Stopped
+  - Solid Green: Machine Running
+  - Flashing Yellow: Holding Start/Stop
+  - Fast Flashing Red: Active Fault
+  - Slow Flashing Red: Clearing Fault
 
-## ⚡ Quickstart
+- **Piezo Buzzer Audio Feedback**:
+  - 1 beep = Start Motor success
+  - 2 beeps = Stop Motor or Fault Cleared
+  - 3 beeps = Fault Detected (also after restart if fault persists)
 
-1. **Clone the Repo**
-   ```bash
-   git clone https://github.com/Beedlebub/plcTrainer_Uno.git
-   cd plcTrainer_Uno
-   ```
+- **EEPROM Fault Recovery**:
+  - If the device is powered off during a fault, the fault state is recovered on reboot.
 
-2. **Open in VSCode + PlatformIO**
+- **Non-blocking millis()-based Timing**:
+  - For button debounce and blinking, no delay()-based blocking.
 
-3. **Verify your `platformio.ini`**
-   ```ini
-   [env:uno]
-   platform = atmelavr
-   board = uno
-   framework = arduino
-   lib_deps = 
-     adafruit/Adafruit NeoPixel@^1.12.5
-   monitor_speed = 115200
-   ```
-
-4. **Upload the code**
-
-5. **Open Serial Monitor @ 115200 baud**
+- **Simple Modular Classes**:
+  - `LedController`
+  - `BuzzerController`
 
 ---
 
-## 📦 Current Release
+## Hardware Requirements
 
-| Version | Notes |
-|:--------|:------|
-| `v2.0`  | Final Phase 2: Stable Motor Control Simulation with modular classes and fault recovery |
-
----
-
-## 📚 Educational Goals
-
-- ✅ Debounced input handling
-- ✅ Non-blocking programming (`millis()`)
-- ✅ Simple class construction in C++
-- ✅ EEPROM state saving
-- ✅ PlatformIO / VSCode workflow
-- ✅ GitHub project maintenance
+| Component                     | Details                          |
+| ------------------------------ | -------------------------------- |
+| Arduino Uno or compatible      | Standard AVR board               |
+| Single NeoPixel LED            | Connected to Pin 7               |
+| Piezo Buzzer                   | Connected to Pin 8               |
+| 3x Momentary Push Buttons      | Connected to Pins 2, 3, 4        |
+| 3x (Optional) 10K Pull-up Resistors | Internal pullups enabled in code |
+| Common Ground                  | Across all devices               |
 
 ---
 
-## 📜 License
+## Pinout
 
-Released under the **MIT License** (see LICENSE file).
+| Pin | Purpose                      |
+| --- | ----------------------------- |
+| D2  | Fault Simulation Button       |
+| D3  | Stop Motor Button             |
+| D4  | Start Motor Button            |
+| D7  | NeoPixel LED Data Line        |
+| D8  | Piezo Buzzer                  |
+
 
 ---
 
-## 🤝 Credits
+## How to Build and Upload
 
-Project by [Beedlebub](https://github.com/Beedlebub)
+### Recommended Toolchain:
+- Visual Studio Code + PlatformIO Extension
 
-Special thanks to OpenAI ChatGPT for guidance on clean C++ modular design.
+### Quick Start
+```bash
+# Clone the repository
+https://github.com/yourusername/plcTrainer_Uno.git
+
+# Open the project in VS Code with PlatformIO
+
+# Ensure `platformio.ini` looks like:
+
+[env:uno]
+platform = atmelavr
+board = uno
+framework = arduino
+lib_deps =
+  adafruit/Adafruit NeoPixel@^1.12.5
+
+monitor_speed = 115200
+
+# Then simply:
+- Click "Build"
+- Click "Upload"
+- Open Serial Monitor
+```
 
 ---
+
+## Development Notes
+
+- Code organized with simple helper classes for LED and Buzzer management.
+- Phase 2 finalizes the "motor logic" portion without physical motor attached.
+- PlatformIO used instead of Arduino IDE for better project management.
+
+Future enhancements in Phase 3+ will add:
+- Real motor control via relay/motor driver
+- Better motor fault detection (stall, overcurrent, etc.)
+- Expanded buzzer/LED patterns for more states
+- Diagnostic serial logging improvements
+
+---
+
+## License
+
+This project is licensed under the **MIT License**.
+
+---
+
+## Credits
+
+- Developed by **Beedlebub** (Brand Inman)
+- Technical guidance and development refinement supported by **OpenAI ChatGPT**
+
+---
+
+_"Build safe. Build smart. Build better."_
+
+---
+
