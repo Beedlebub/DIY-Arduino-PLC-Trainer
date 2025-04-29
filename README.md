@@ -3,9 +3,9 @@
 
 The photo below shows the Phase 2 trainer hardware in its current state.
 
-It includes an Arduino Uno, labeled Start/Stop/Fault buttons, NeoPixel LED, piezo buzzer for state feedback, a buck converter module, and a 4-channel relay board — all mounted to a 3D-printed frame.
+It includes an Arduino Uno, labeled Start/Stop/Fault buttons, a NeoPixel LED, a piezo buzzer for state feedback, a buck converter module, and a 4-channel relay board — all mounted to a 3D-printed frame, all powered by a 12V 10A power supply.
 
-This modular hardware layout will support future phases as new features like motor control, analog sensors, and networking are added.
+This modular hardware layout will support future phases as new features, such as motor control, analog sensors, and networking, are added.
 
 ![PLC Trainer Setup](docs/plcTrainer_setup.jpg)
 
@@ -117,7 +117,7 @@ monitor_speed = 115200
 
 - Code organized with simple helper classes for LED and Buzzer management.
 - Phase 2 finalizes the "motor logic" portion without physical motor attached.
-- PlatformIO used instead of Arduino IDE for better project management.
+- PlatformIO is used instead of Arduino IDE for better project management.
 
 Future enhancements in Phase 3+ will add:
 - Real motor control via relay/motor driver
