@@ -3,9 +3,9 @@
 
 The photo below shows the Phase 2 trainer hardware in its current state.
 
-It includes an Arduino Uno, labeled Start/Stop/Fault buttons, a NeoPixel LED, a piezo buzzer for state feedback, a buck converter module, and a 4-channel relay board — all mounted to a 3D-printed frame, all powered by a 12V 10A power supply.
+It includes an Arduino Uno, a terminal adapter shield for easy wiring, labeled Start/Stop/Fault buttons, a NeoPixel LED and a piezo buzzer for state feedback, a buck converter module, and a 4-channel relay board — all mounted to a 3D-printed frame, and powered by a 12V 10A power supply.
 
-This modular hardware layout will support future phases as new features, such as motor control, analog sensors, and networking, are added.
+This modular hardware layout will support future phases as new features like motor control, analog sensors, and networking are added.
 
 ![PLC Trainer Setup](docs/plcTrainer_setup.jpg)
 
