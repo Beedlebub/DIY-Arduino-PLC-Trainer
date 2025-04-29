@@ -5,6 +5,13 @@ It models machine states (Stopped, Running, Fault) and now **controls a real mot
 
 ![PLC Trainer Setup](docs/plcTrainer_setup.jpg)
 
+## 📽️ Demo Video
+
+[![Watch the demo](https://img.youtube.com/vi/JHllzX9L-uM/0.jpg)](https://www.youtube.com/watch?v=JHllzX9L-uM)
+
+▶️ [Watch on YouTube](https://www.youtube.com/watch?v=JHllzX9L-uM)
+
+
 ---
 
 ## Features
