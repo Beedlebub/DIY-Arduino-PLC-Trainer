@@ -1,107 +1,112 @@
-# PLC Trainer (Arduino Uno) (Currently @ Phase 2 Final)
-🛠 Built with PlatformIO
-🎯 Target platform: Arduino Uno
+# plcTrainer_Uno
 
-Overview:
-This project simulates a basic industrial motor controller using an Arduino Uno. It can be programmed in C++, but better yet, use OpenPLC!!
+**Phase 2 Final Version:** Beginner-Friendly Motor Controller Simulation for Arduino Uno.
 
-It uses:
-- Physical buttons
-- A NeoPixel LED
-- A piezo buzzer
-...to represent machine states: Stopped, Running, and Fault.
+This project simulates an industrial-style Start/Stop/Fault machine controller using **physical buttons**, a **NeoPixel LED**, and a **piezo buzzer** — built with modern C++ structure (PlatformIO + VSCode ready).
 
-Button holds are required for confirmation — not just taps — to better simulate real-world machine control systems.
+---
 
+## 🚀 Features
 
-Features:
-✅ 3 Buttons for User Control:
-- Start button → Begin motor (after 3s hold)
-- Stop button → Stop motor (after 3s hold)
-- Fault simulation button → Trigger immediate FAULT
+✅ 3 Button Inputs:
+- **Start Motor**
+- **Stop Motor**
+- **Fault Injection**
 
-✅ NeoPixel LED Visual Feedback:
-- Solid Red → Machine Stopped
-- Solid Green → Machine Running
-- Flashing Yellow → During Start/Stop hold
-- Fast Flashing Red → Active Fault
-- Slow Flashing Red → Fault Clear in Progress
+✅ NeoPixel LED Feedback:
+- 🔴 Solid Red = Stopped
+- 🟢 Solid Green = Running
+- 🟡 Flashing Yellow = Holding button
+- 🔴 Fast Flashing Red = Active Fault
+- 🔴 Slow Flashing Red = Fault Clearing in progress
 
-✅ Piezo Buzzer Audio Feedback:
-- 1 beep → Start successful
-- 2 beeps → Stop successful or Fault cleared
-- 3 quick beeps → Fault triggered or recovered on power-up
+✅ Piezo Buzzer Feedback:
+- 1 beep → Start success
+- 2 beeps → Stop success or Fault cleared
+- 3 beeps → Fault occurred (including on power-up if fault persisted)
 
-✅ EEPROM Fault Recovery:
-- Fault state is saved and restored after a power cycle.
+✅ EEPROM Fault Recovery
+- Reboots back into FAULT if shut down during fault state
 
-✅ Debounced, Non-blocking Button Handling:
-- Millis()-based, no delay() blocking.
+✅ Debounced Button Handling (non-blocking using `millis()`)
 
-✅ Modular Code Design:
-- LedController class
-- BuzzerController class
+✅ Clean C++ Structure:
+- `LedController` class
+- `BuzzerController` class
 
+✅ PlatformIO Native Build Support (no Arduino IDE needed)
 
-Hardware Requirements:
-Component                               | Notes
-Arduino Uno (or compatible)             | Standard AVR board
-NeoPixel LED (single)                   | Data line to pin D7
-Piezo buzzer                            | Connected to D8
-3x Momentary buttons                    | Start (D4), Stop (D3), Fault (D2)
-3x 10K Ohm pull-up resistors (optional) | Internal pull-ups enabled in software
-Common ground across all components     | Essential
+---
 
+## 🛠️ Hardware Requirements
 
-Wiring Diagram:
-| Pin | Purpose          |
-|-----|------------------|
-| D2  | Fault Button      |
-| D3  | Stop Button       |
-| D4  | Start Button      |
-| D7  | NeoPixel Data     |
-| D8  | Piezo Buzzer      |
-| 5V  | Shared Power      |
-| GND | Shared Ground     |
+| Component                      | Notes                                |
+|:--------------------------------|:-------------------------------------|
+| Arduino Uno (or compatible)     | AVR-based board |
+| NeoPixel Single LED             | Connect to D7 |
+| Piezo Buzzer                    | Connect to D8 |
+| Start/Stop/Fault Buttons        | Connect to D4/D3/D2 respectively |
+| 10K Pull-up Resistors (optional) | Internal pull-ups enabled |
+| Common Ground                   | Required for all components |
 
-+5V  ----+--------------------+
-        |                    |
-      (Button)             (Button)
-    [Start] Pin D4      [Stop] Pin D3
-        |                    |
-        GND                  GND
+---
 
-    (Button)
-  [Fault] Pin D2
-      |
-      GND
+## ⚡ Quickstart
 
-      +----------------+
-      | NeoPixel (1x LED)
-      |  Data In -> D7
-      |  Power -> 5V
-      |  GND -> GND
-      +----------------+
+1. **Clone the Repo**
+   ```bash
+   git clone https://github.com/Beedlebub/plcTrainer_Uno.git
+   cd plcTrainer_Uno
+   ```
 
-      +----------------+
-      | Piezo Buzzer
-      |  + -> D8
-      |  - -> GND
-      +----------------+
+2. **Open in VSCode + PlatformIO**
 
-(All components share a common ground.)
+3. **Verify your `platformio.ini`**
+   ```ini
+   [env:uno]
+   platform = atmelavr
+   board = uno
+   framework = arduino
+   lib_deps = 
+     adafruit/Adafruit NeoPixel@^1.12.5
+   monitor_speed = 115200
+   ```
 
+4. **Upload the code**
 
+5. **Open Serial Monitor @ 115200 baud**
 
-Quick Demo Instructions:
-- Hold Start Button (D4) for 3 seconds → Motor "starts" (Solid Green LED + 1 beep).
-- Hold Stop Button (D3) for 3 seconds → Motor "stops" (Solid Red LED + 2 beeps).
-- Press Fault Button (D2) once → Immediate Fault (Fast Red Flash + 3 quick beeps).
-- Hold Fault Button (D2) for 5 seconds → Clear Fault (Slow Red Flash during hold, 2 beeps after success).
+---
 
+## 📦 Current Release
 
-Credits
-- Developed by Beedlebub
-- Technical architecture and code refinement support by OpenAI ChatGPT
+| Version | Notes |
+|:--------|:------|
+| `v2.0`  | Final Phase 2: Stable Motor Control Simulation with modular classes and fault recovery |
 
+---
 
+## 📚 Educational Goals
+
+- ✅ Debounced input handling
+- ✅ Non-blocking programming (`millis()`)
+- ✅ Simple class construction in C++
+- ✅ EEPROM state saving
+- ✅ PlatformIO / VSCode workflow
+- ✅ GitHub project maintenance
+
+---
+
+## 📜 License
+
+Released under the **MIT License** (see LICENSE file).
+
+---
+
+## 🤝 Credits
+
+Project by [Beedlebub](https://github.com/Beedlebub)
+
+Special thanks to OpenAI ChatGPT for guidance on clean C++ modular design.
+
+---
