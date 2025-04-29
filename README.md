@@ -3,7 +3,7 @@
 🎯 Target platform: Arduino Uno
 
 Overview:
-This project simulates a basic industrial motor controller using an Arduino Uno.
+This project simulates a basic industrial motor controller using an Arduino Uno. It can be programmed in C++, but better yet, use OpenPLC!!
 
 It uses:
 - Physical buttons
