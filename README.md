@@ -3,6 +3,8 @@
 This project simulates a basic industrial PLC system using an Arduino Uno.  
 It models machine states (Stopped, Running, Fault) and now **controls a real motor** through a relay.
 
+![PLC Trainer Setup](docs/plcTrainer_setup.jpg)
+
 ---
 
 ## Features
