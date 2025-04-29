@@ -1,146 +1,111 @@
-# plcTrainer_Uno
-## Trainer Setup
+# PLC Trainer - Arduino Uno - Phase 3 (Motor Integration)
 
-The photo below shows the Phase 2 trainer hardware in its current state.
-
-It includes an Arduino Uno, labeled Start/Stop/Fault buttons, NeoPixel LED, piezo buzzer for state feedback, a buck converter module, and a 4-channel relay board — all mounted to a 3D-printed frame.
-
-This modular hardware layout will support future phases as new features like motor control, analog sensors, and networking are added.
-
-![PLC Trainer Setup](docs/plcTrainer_setup.jpg)
-
-
-
-**Phase 2 Final Release**
-
----
-
-## Overview
-
-This project simulates a basic industrial motor control system using an Arduino Uno.
-It uses physical buttons, a NeoPixel LED, and a piezo buzzer to represent machine states like **Stopped**, **Running**, and **Fault**.
-
-User input requires **button holds** to validate intent, mimicking real-world industrial safety logic.
-The project is designed using **simple C++ classes** for LED and Buzzer management, while keeping the main logic easily understandable.
+This project simulates a basic industrial PLC system using an Arduino Uno.  
+It models machine states (Stopped, Running, Fault) and now **controls a real motor** through a relay.
 
 ---
 
 ## Features
 
-- **3 Buttons**:
-  - **Start Motor** Button
-  - **Stop Motor** Button
-  - **Fault Simulation** Button
+✅ **Start Button** (Hold 3 seconds to start motor)  
+✅ **Stop Button** (Hold 3 seconds to stop motor)  
+✅ **Fault Simulation Button** (Instantly trigger fault)  
+✅ **Motor Relay Control** (Pin 12)  
+✅ **Visual LED Feedback**  
+✅ **Audible Buzzer Feedback**  
+✅ **Fault Recovery via EEPROM**  
+✅ **Non-blocking `millis()` timing for LED and buttons**  
+✅ **Clean C++ classes for LED and buzzer handling**  
 
-- **NeoPixel LED Visual Feedback**:
-  - Solid Red: Machine Stopped
-  - Solid Green: Machine Running
-  - Flashing Yellow: Holding Start/Stop
-  - Fast Flashing Red: Active Fault
-  - Slow Flashing Red: Clearing Fault
+---
 
-- **Piezo Buzzer Audio Feedback**:
-  - 1 beep = Start Motor success
-  - 2 beeps = Stop Motor or Fault Cleared
-  - 3 beeps = Fault Detected (also after restart if fault persists)
+## System Behavior
 
-- **EEPROM Fault Recovery**:
-  - If the device is powered off during a fault, the fault state is recovered on reboot.
-
-- **Non-blocking millis()-based Timing**:
-  - For button debounce and blinking, no delay()-based blocking.
-
-- **Simple Modular Classes**:
-  - `LedController`
-  - `BuzzerController`
+| State | LED Feedback | Buzzer Feedback | Motor Relay |
+|:-----|:-------------|:----------------|:------------|
+| Stopped (OFF) | Solid Red | 2 beeps (stop success) | OFF |
+| Running | Solid Green | 1 beep (start success) | ON |
+| Holding Start/Stop | Flashing Yellow | None during hold | (Depends) |
+| Fault Active | Fast Flashing Red | 3 quick beeps | OFF |
+| Fault Clearing | Slow Flashing Red | 2 beeps when cleared | OFF |
 
 ---
 
 ## Hardware Requirements
 
-| Component                     | Details                          |
-| ------------------------------ | -------------------------------- |
-| Arduino Uno or compatible      | Standard AVR board               |
-| Single NeoPixel LED            | Connected to Pin 7               |
-| Piezo Buzzer                   | Connected to Pin 8               |
-| 3x Momentary Push Buttons      | Connected to Pins 2, 3, 4        |
-| 3x (Optional) 10K Pull-up Resistors | Internal pullups enabled in code |
-| Common Ground                  | Across all devices               |
+| Component | Notes |
+|:----------|:------|
+| Arduino Uno | Standard AVR |
+| Terminal Breakout Shield | For easier wiring |
+| NeoPixel LED | Data pin 7 |
+| Piezo Buzzer | Pin 8 |
+| 4-Channel Relay Module | 5V type, triggered LOW |
+| 12V DC Motor | Driven by Relay Channel 1 |
+| 12V 10A Power Supply | Powers entire system |
+| 3x Momentary Buttons | Start, Stop, Fault Sim |
+| 3D-Printed Mounting Frame | Optional for neatness |
 
 ---
 
-## Pinout
+## Wiring Overview
 
-| Pin | Purpose                      |
-| --- | ----------------------------- |
-| D2  | Fault Simulation Button       |
-| D3  | Stop Motor Button             |
-| D4  | Start Motor Button            |
-| D7  | NeoPixel LED Data Line        |
-| D8  | Piezo Buzzer                  |
-
-
----
-
-## How to Build and Upload
-
-### Recommended Toolchain:
-- Visual Studio Code + PlatformIO Extension
-
-### Quick Start
-```bash
-# Clone the repository
-https://github.com/yourusername/plcTrainer_Uno.git
-
-# Open the project in VS Code with PlatformIO
-
-# Ensure `platformio.ini` looks like:
-
-[env:uno]
-platform = atmelavr
-board = uno
-framework = arduino
-lib_deps =
-  adafruit/Adafruit NeoPixel@^1.12.5
-
-monitor_speed = 115200
-
-# Then simply:
-- Click "Build"
-- Click "Upload"
-- Open Serial Monitor
-```
+| Arduino Pin | Connected To |
+|:------------|:-------------|
+| D2 | Fault Simulation Button |
+| D3 | Stop Button |
+| D4 | Start Button |
+| D7 | NeoPixel LED (Signal) |
+| D8 | Piezo Buzzer |
+| D12 | Relay Channel 1 (Motor Control) |
+| VIN/GND | Buck converter + relay + motor |
 
 ---
 
-## Development Notes
+## Setup Instructions
 
-- Code organized with simple helper classes for LED and Buzzer management.
-- Phase 2 finalizes the "motor logic" portion without physical motor attached.
-- PlatformIO used instead of Arduino IDE for better project management.
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/Beedlebub/plcTrainer_Uno.git
+    ```
 
-Future enhancements in Phase 3+ will add:
-- Real motor control via relay/motor driver
-- Better motor fault detection (stall, overcurrent, etc.)
-- Expanded buzzer/LED patterns for more states
-- Diagnostic serial logging improvements
+2. Open project in **VSCode + PlatformIO**.
+
+3. Verify `platformio.ini` settings:
+    ```ini
+    [env:uno]
+    platform = atmelavr
+    board = uno
+    framework = arduino
+    lib_deps = 
+      adafruit/Adafruit NeoPixel@^1.12.5
+    monitor_speed = 115200
+    ```
+
+4. Connect hardware as per wiring diagram.
+
+5. Upload firmware:
+    - Press PlatformIO "Upload" button or use `pio run --target upload`.
+
+6. Open Serial Monitor (115200 baud) to watch debug output.
+
+---
+
+## Versioning
+
+- `Phase 3.0.2`  
+- Code includes helper classes, clean state management, and motor relay integration.
+
+Future Roadmap:
+- Consolidate blinking logic even further.
+- Introduce a `ButtonController` class to cleanly handle all buttons.
+- Expand system to higher voltages (12V and eventually 24V).
 
 ---
 
 ## License
 
-This project is licensed under the **MIT License**.
+MIT License
 
 ---
 
-## Credits
-
-- Developed by **Beedlebub** (Brand Inman)
-- Technical guidance and development refinement supported by **OpenAI ChatGPT**
-
----
-
-_"Build safe. Build smart. Build better. And always, build fun things!!"_
-
----
-
+**Build smart. Build safe. Build awesome. And above all — have fun! 🚀**
