@@ -46,13 +46,13 @@ It models machine states (Stopped, Running, Fault) and now **controls a real mot
 |:----------|:------|
 | Arduino Uno | Standard AVR |
 | Terminal Breakout Shield | For easier wiring |
-| NeoPixel LED | Data pin 7 |
-| Piezo Buzzer | Pin 8 |
+| NeoPixel LED | 3 pins: 5V, ground and data |
+| Piezo Buzzer | 2 pins: ground and data |
 | 4-Channel Relay Module | 5V type, triggered LOW |
-| 12V DC Motor | Driven by Relay Channel 1 |
+| 12V DC Motor | Driven by Relay Channel 4 |
 | 12V 10A Power Supply | Powers entire system |
 | 3x Momentary Buttons | Start, Stop, Fault Sim |
-| 3D-Printed Mounting Frame | Optional for neatness |
+| 3D-Printed DIN Rail mounting parts | Optional for neatness |
 
 ---
 
@@ -66,7 +66,7 @@ It models machine states (Stopped, Running, Fault) and now **controls a real mot
 | D7 | NeoPixel LED (Signal) |
 | D8 | Piezo Buzzer |
 | D12 | Relay Channel 1 (Motor Control) |
-| VIN/GND | Buck converter + relay + motor |
+| VIN/GND | Buck converter + relay + Arduino |
 
 ---
 
@@ -102,7 +102,7 @@ It models machine states (Stopped, Running, Fault) and now **controls a real mot
 ## Versioning
 
 - `Phase 3.0.4`  
-- Code includes helper classes, clean state management, and motor relay integration.
+- Code includes helper classes, clean state management, and motor-relay integration.
 - Added return after transitioning to FAULT to avoid "released early" print.
 - Improved early-release handling and comment clarity.
 
@@ -120,4 +120,4 @@ MIT License
 
 ---
 
-**Build smart. Build safe. Build awesome. And above all — have fun! 🚀**
+**Build smart. Build safe. Build awesome. And above all — build fun things! 🚀**
