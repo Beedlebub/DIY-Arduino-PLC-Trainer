@@ -19,7 +19,7 @@ It models machine states (Stopped, Running, Fault) and now **controls a real mot
 ✅ **Start Button** (Hold 3 seconds to start motor)  
 ✅ **Stop Button** (Hold 3 seconds to stop motor)  
 ✅ **Fault Simulation Button** (Instantly trigger fault)  
-✅ **Motor Relay Control**
+✅ **Motor Relay Control**  
 ✅ **Visual LED Feedback**  
 ✅ **Audible Buzzer Feedback**  
 ✅ **Fault Recovery via EEPROM**  
