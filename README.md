@@ -65,7 +65,7 @@ It models machine states (Stopped, Running, Fault) and now **controls a real mot
 | D4 | Start Button |
 | D7 | NeoPixel LED (Signal) |
 | D8 | Piezo Buzzer |
-| D12 | Relay Channel 1 (Motor Control) |
+| D12 | Relay Channel 4 (Motor Control) |
 | VIN/GND | Buck converter + relay + Arduino |
 
 ---
