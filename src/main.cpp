@@ -7,26 +7,28 @@
 #include <EEPROM.h>
 
 // --------- Pin Assignments ---------
+// These pins map to your physical trainer setup
 const int startMotorButtonPin = 4;
 const int stopMotorButtonPin = 3;
 const int faultSimButtonPin = 2;
-const int ledPin = 7;
+const int ledPin = 7;                    // NeoPixel LED
 const int ledCount = 1;
 const int ledBrightness = 50;
-const int buzzerPin = 8;
-const int motorRelayPin = 12;
+const int buzzerPin = 8;                 // Piezo buzzer
+const int motorRelayPin = 12;            // Relay control pin
 
 // --------- EEPROM Address ---------
-const int stateEEPROMAddress = 0;
+const int stateEEPROMAddress = 0;        // Store FAULT state here
 
 // --------- Timing Constants ---------
 const unsigned long slowBlinkInterval = 500;
 const unsigned long fastBlinkInterval = 100;
-const unsigned long faultClearDuration = 5000;
-const unsigned long holdDuration = 3000;
-const unsigned long debounceDelay = 50;
+const unsigned long faultClearDuration = 5000;  // 5 sec hold to clear fault
+const unsigned long holdDuration = 3000;        // 3 sec hold to start/stop
+const unsigned long debounceDelay = 50;         // Button debounce delay
 
 // --------- System State Enum ---------
+// Describes the state machine: OFF, RUNNING, or FAULT
 enum SystemState {
   OFF,
   RUNNING,
@@ -62,6 +64,7 @@ class BuzzerController {
 };
 
 // --------- Button Handler Class ---------
+// Encapsulates button debounce, hold detection, and early release
 class ButtonHandler {
   private:
     int pin;
@@ -176,14 +179,14 @@ void loop() {
   }
 
   handleBlink();
-  delay(10);
+  delay(10);  // Helps avoid excessive CPU usage
 }
 
 // --------- Core Functions ---------
 void setSystemOff() {
   currentState = OFF;
   digitalWrite(motorRelayPin, LOW);
-  led.setColor(255, 0, 0);
+  led.setColor(255, 0, 0);  // Solid red = stopped
   Serial.println("System Initialized: OFF state");
 }
 
@@ -193,7 +196,7 @@ void handleOffState() {
     Serial.println("Start button held 3 sec - Transition to RUNNING");
     currentState = RUNNING;
     digitalWrite(motorRelayPin, HIGH);
-    led.setColor(0, 255, 0);
+    led.setColor(0, 255, 0);  // Solid green = running
     startBlinkActive = false;
   } else {
     startBlinkActive = startBtn.isHolding();
@@ -259,14 +262,15 @@ void handleBlink() {
       led.clear();
     } else {
       if (currentState == FAULT) {
-        led.setColor(255, 0, 0);
+        led.setColor(255, 0, 0);  // Blink red
       } else {
-        led.setColor(255, 255, 0);
+        led.setColor(255, 255, 0);  // Blink yellow
       }
     }
     ledState = !ledState;
   }
 }
 
+// --------- EEPROM Handling ---------
 void saveFaultToEEPROM() { EEPROM.write(stateEEPROMAddress, 1); }
 void clearFaultInEEPROM() { EEPROM.write(stateEEPROMAddress, 0); }
