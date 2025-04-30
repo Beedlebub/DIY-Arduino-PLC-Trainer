@@ -1,10 +1,6 @@
-// Phase 3.0.2: Helpers restored + Motor Relay Integration
+// Phase 3.0.4: Fixed double-print on fault press
 // ------------------------------------------------------------
-// This file is based on Phase 3 Starter.
-
-// FUTURE ENHANCEMENTS:
-// - Consolidate blinking logic by setting activeBlinkInterval and color directly in state handlers.
-// - Consider implementing a Button class to encapsulate debouncing and hold detection.
+// - Added return after transitioning to FAULT to avoid "released early" print
 
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
@@ -18,7 +14,7 @@ const int ledPin = 7;
 const int ledCount = 1;
 const int ledBrightness = 50;
 const int buzzerPin = 8;
-const int motorRelayPin = 12; // New relay pin for motor control
+const int motorRelayPin = 12;
 
 // --------- EEPROM Address ---------
 const int stateEEPROMAddress = 0;
@@ -30,33 +26,6 @@ const unsigned long faultClearDuration = 5000;
 const unsigned long holdDuration = 3000;
 const unsigned long debounceDelay = 50;
 
-// --------- State Variables ---------
-bool ledState = false;
-unsigned long lastBlinkTime = 0;
-unsigned long faultHoldStartTime = 0;
-unsigned long startHoldStartTime = 0;
-unsigned long stopHoldStartTime = 0;
-
-bool startHoldInProgress = false;
-bool stopHoldInProgress = false;
-bool faultClearing = false;
-bool startBlinkActive = false;
-bool stopBlinkActive = false;
-
-unsigned long activeBlinkInterval = slowBlinkInterval;
-
-bool debouncedStartPressed = false;
-bool debouncedStopPressed = false;
-bool debouncedFaultPressed = false;
-
-bool lastStartRawRead = HIGH;
-bool lastStopRawRead = HIGH;
-bool lastFaultRawRead = HIGH;
-
-unsigned long lastStartDebounceTime = 0;
-unsigned long lastStopDebounceTime = 0;
-unsigned long lastFaultDebounceTime = 0;
-
 // --------- System State Enum ---------
 enum SystemState {
   OFF,
@@ -65,7 +34,7 @@ enum SystemState {
 };
 SystemState currentState = OFF;
 
-// --------- LedController Class ---------
+// --------- LED and Buzzer Controllers ---------
 class LedController {
   private:
     Adafruit_NeoPixel strip;
@@ -76,23 +45,93 @@ class LedController {
     void clear() { strip.clear(); strip.show(); }
 };
 
-// --------- BuzzerController Class ---------
 class BuzzerController {
   private:
     int pin;
   public:
     BuzzerController(int p) : pin(p) {}
     void begin() { pinMode(pin, OUTPUT); }
-    void beep(int times, int durationMs, int gapMs) { for (int i = 0; i < times; i++) { tone(pin, 2000); delay(durationMs); noTone(pin); if (i < times - 1) delay(gapMs); } }
+    void beep(int times, int durationMs, int gapMs) {
+      for (int i = 0; i < times; i++) {
+        tone(pin, 2000);
+        delay(durationMs);
+        noTone(pin);
+        if (i < times - 1) delay(gapMs);
+      }
+    }
 };
 
-// --------- Controller Instances ---------
+// --------- Button Handler Class ---------
+class ButtonHandler {
+  private:
+    int pin;
+    bool lastRawState = HIGH;
+    unsigned long lastDebounceTime = 0;
+    bool debouncedPressed = false;
+    unsigned long holdStartTime = 0;
+    bool holdActive = false;
+    bool releasedEarly = false;
+
+  public:
+    ButtonHandler(int p) : pin(p) {}
+
+    void begin() { pinMode(pin, INPUT_PULLUP); }
+
+    void update() {
+      bool rawState = digitalRead(pin);
+      if (rawState != lastRawState) lastDebounceTime = millis();
+      if ((millis() - lastDebounceTime) > debounceDelay) debouncedPressed = (rawState == LOW);
+      lastRawState = rawState;
+    }
+
+    bool isPressed() { return debouncedPressed; }
+
+    bool startHold(unsigned long durationMs) {
+      if (debouncedPressed) {
+        if (!holdActive) {
+          holdStartTime = millis();
+          holdActive = true;
+        } else if (millis() - holdStartTime >= durationMs) {
+          holdActive = false;
+          return true;
+        }
+      } else {
+        if (holdActive && (millis() - holdStartTime < durationMs)) {
+          releasedEarly = true;
+        }
+        holdActive = false;
+      }
+      return false;
+    }
+
+    bool isHolding() { return debouncedPressed && holdActive; }
+
+    bool wasReleasedEarly(unsigned long durationMs) {
+      if (releasedEarly) {
+        releasedEarly = false;
+        return true;
+      }
+      return false;
+    }
+};
+
+// --------- Instances ---------
 LedController led(ledPin, ledCount);
 BuzzerController buzzer(buzzerPin);
+ButtonHandler startBtn(startMotorButtonPin);
+ButtonHandler stopBtn(stopMotorButtonPin);
+ButtonHandler faultBtn(faultSimButtonPin);
+
+// --------- Blink State ---------
+bool ledState = false;
+unsigned long lastBlinkTime = 0;
+unsigned long activeBlinkInterval = slowBlinkInterval;
+bool startBlinkActive = false;
+bool stopBlinkActive = false;
+bool faultClearing = false;
 
 // --------- Function Declarations ---------
 void setSystemOff();
-void readButtons();
 void handleOffState();
 void handleRunningState();
 void handleFaultState();
@@ -103,12 +142,13 @@ void clearFaultInEEPROM();
 // --------- Setup Function ---------
 void setup() {
   Serial.begin(115200);
-  pinMode(startMotorButtonPin, INPUT_PULLUP);
-  pinMode(stopMotorButtonPin, INPUT_PULLUP);
-  pinMode(faultSimButtonPin, INPUT_PULLUP);
   pinMode(motorRelayPin, OUTPUT);
   led.begin();
   buzzer.begin();
+  startBtn.begin();
+  stopBtn.begin();
+  faultBtn.begin();
+
   byte savedState = EEPROM.read(stateEEPROMAddress);
   if (savedState == 1) {
     Serial.println("Recovered FAULT from EEPROM");
@@ -125,39 +165,92 @@ void setup() {
 
 // --------- Main Loop ---------
 void loop() {
-  readButtons();
+  startBtn.update();
+  stopBtn.update();
+  faultBtn.update();
+
   switch (currentState) {
     case OFF: handleOffState(); break;
     case RUNNING: handleRunningState(); break;
     case FAULT: handleFaultState(); break;
   }
+
   handleBlink();
   delay(10);
 }
 
-// --------- Helper Functions ---------
-void readButtons() {
-  bool readingStart = (digitalRead(startMotorButtonPin) == LOW);
-  bool readingStop = (digitalRead(stopMotorButtonPin) == LOW);
-  bool readingFault = (digitalRead(faultSimButtonPin) == LOW);
+// --------- Core Functions ---------
+void setSystemOff() {
+  currentState = OFF;
+  digitalWrite(motorRelayPin, LOW);
+  led.setColor(255, 0, 0);
+  Serial.println("System Initialized: OFF state");
+}
 
-  if (readingStart != lastStartRawRead) lastStartDebounceTime = millis();
-  if (readingStop != lastStopRawRead) lastStopDebounceTime = millis();
-  if (readingFault != lastFaultRawRead) lastFaultDebounceTime = millis();
+void handleOffState() {
+  if (startBtn.startHold(holdDuration)) {
+    buzzer.beep(1, 100, 100);
+    Serial.println("Start button held 3 sec - Transition to RUNNING");
+    currentState = RUNNING;
+    digitalWrite(motorRelayPin, HIGH);
+    led.setColor(0, 255, 0);
+    startBlinkActive = false;
+  } else {
+    startBlinkActive = startBtn.isHolding();
+    if (startBtn.wasReleasedEarly(holdDuration)) {
+      Serial.println("Start button released early - Cancel Start");
+    }
+    if (!startBtn.isPressed()) led.setColor(255, 0, 0);
+  }
+}
 
-  if ((millis() - lastStartDebounceTime) > debounceDelay) debouncedStartPressed = readingStart;
-  if ((millis() - lastStopDebounceTime) > debounceDelay) debouncedStopPressed = readingStop;
-  if ((millis() - lastFaultDebounceTime) > debounceDelay) debouncedFaultPressed = readingFault;
+void handleRunningState() {
+  if (stopBtn.startHold(holdDuration)) {
+    buzzer.beep(2, 100, 100);
+    Serial.println("Stop button held 3 sec - Transition to OFF");
+    setSystemOff();
+    stopBlinkActive = false;
+  } else {
+    stopBlinkActive = stopBtn.isHolding();
+    if (stopBtn.wasReleasedEarly(holdDuration)) {
+      Serial.println("Stop button released early - Cancel Stop");
+    }
+    if (!stopBtn.isPressed()) led.setColor(0, 255, 0);
+  }
 
-  lastStartRawRead = readingStart;
-  lastStopRawRead = readingStop;
-  lastFaultRawRead = readingFault;
+  if (faultBtn.isPressed()) {
+    buzzer.beep(3, 75, 75);
+    Serial.println("Fault button pressed - Immediate FAULT");
+    saveFaultToEEPROM();
+    currentState = FAULT;
+    activeBlinkInterval = fastBlinkInterval;
+    lastBlinkTime = millis();
+    ledState = false;
+    faultClearing = false;
+    digitalWrite(motorRelayPin, LOW);
+    return;
+  }
+}
+
+void handleFaultState() {
+  if (faultBtn.startHold(faultClearDuration)) {
+    buzzer.beep(2, 100, 100);
+    Serial.println("Fault button held 5 sec - FAULT CLEARED");
+    clearFaultInEEPROM();
+    setSystemOff();
+    faultClearing = false;
+  } else {
+    faultClearing = faultBtn.isHolding();
+    if (faultBtn.wasReleasedEarly(faultClearDuration)) {
+      Serial.println("Fault button released early - Reset canceled");
+    }
+    activeBlinkInterval = faultClearing ? slowBlinkInterval : fastBlinkInterval;
+  }
 }
 
 void handleBlink() {
   unsigned long currentMillis = millis();
   bool shouldBlink = (currentState == FAULT) || (currentState == OFF && startBlinkActive) || (currentState == RUNNING && stopBlinkActive);
-
   if (!shouldBlink && !faultClearing) return;
 
   if (currentMillis - lastBlinkTime >= activeBlinkInterval) {
@@ -177,89 +270,3 @@ void handleBlink() {
 
 void saveFaultToEEPROM() { EEPROM.write(stateEEPROMAddress, 1); }
 void clearFaultInEEPROM() { EEPROM.write(stateEEPROMAddress, 0); }
-
-void setSystemOff() {
-  currentState = OFF;
-  led.setColor(255, 0, 0);
-  digitalWrite(motorRelayPin, LOW);
-  Serial.println("System Initialized: OFF state");
-}
-
-void handleOffState() {
-  unsigned long currentMillis = millis();
-  if (debouncedStartPressed) {
-    if (!startHoldInProgress) {
-      startHoldInProgress = true;
-      startHoldStartTime = currentMillis;
-      startBlinkActive = true;
-    } else if (currentMillis - startHoldStartTime >= holdDuration) {
-      buzzer.beep(1, 100, 100);
-      Serial.println("Green Button Held 3 sec - Transition to RUNNING");
-      currentState = RUNNING;
-      digitalWrite(motorRelayPin, HIGH);
-      led.setColor(0, 255, 0);
-      startHoldInProgress = false;
-      startBlinkActive = false;
-    }
-  } else {
-    if (startHoldInProgress) Serial.println("Green Button Released Early - Cancel Start");
-    startHoldInProgress = false;
-    startBlinkActive = false;
-    led.setColor(255, 0, 0);
-  }
-}
-
-void handleRunningState() {
-  unsigned long currentMillis = millis();
-  if (debouncedStopPressed) {
-    if (!stopHoldInProgress) {
-      stopHoldInProgress = true;
-      stopHoldStartTime = currentMillis;
-      stopBlinkActive = true;
-    } else if (currentMillis - stopHoldStartTime >= holdDuration) {
-      buzzer.beep(2, 100, 100);
-      Serial.println("Red Button Held 3 sec - Transition to OFF");
-      setSystemOff();
-      stopHoldInProgress = false;
-      stopBlinkActive = false;
-    }
-  } else {
-    if (stopHoldInProgress) Serial.println("Red Button Released Early - Cancel Stop");
-    stopHoldInProgress = false;
-    stopBlinkActive = false;
-    led.setColor(0, 255, 0);
-  }
-
-  if (debouncedFaultPressed) {
-    buzzer.beep(3, 75, 75);
-    Serial.println("Yellow Button Pressed - Immediate FAULT");
-    saveFaultToEEPROM();
-    currentState = FAULT;
-    activeBlinkInterval = fastBlinkInterval;
-    lastBlinkTime = millis();
-    ledState = false;
-    faultClearing = false;
-    digitalWrite(motorRelayPin, LOW);
-  }
-}
-
-void handleFaultState() {
-  unsigned long currentMillis = millis();
-  if (debouncedFaultPressed) {
-    if (!faultClearing) {
-      faultClearing = true;
-      faultHoldStartTime = currentMillis;
-      activeBlinkInterval = slowBlinkInterval;
-    } else if (currentMillis - faultHoldStartTime >= faultClearDuration) {
-      buzzer.beep(2, 100, 100);
-      Serial.println("Yellow Button Held 5 sec - Clear FAULT");
-      clearFaultInEEPROM();
-      setSystemOff();
-      faultClearing = false;
-    }
-  } else {
-    if (faultClearing) Serial.println("Yellow Button Released Early - Cancel Fault Clear");
-    faultClearing = false;
-    activeBlinkInterval = fastBlinkInterval;
-  }
-}

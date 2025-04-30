@@ -43,7 +43,6 @@ _(Diagram to be added later.)_
 ## Photos
 
 ![PLC Trainer Setup](plcTrainer_setup.jpg)
-![Simplified Wiring Diagram] 
 
 ---
 

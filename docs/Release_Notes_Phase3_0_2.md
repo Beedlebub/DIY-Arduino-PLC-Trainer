@@ -18,7 +18,3 @@
 - No external libraries added beyond Adafruit NeoPixel
 
 ---
-
-🔔 **Reminder:**  
-This version fully closes Phase 3.0.2.  
-You can now safely branch off for new work (Phase 3.0.3+, motor ramping, PWM upgrades, etc.)  
