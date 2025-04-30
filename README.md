@@ -1,6 +1,6 @@
 # DIY PLC Trainer - Arduino Uno - Phase 3 (Motor Integration)
 
-This project simulates a basic industrial PLC system using an Arduino Uno.  
+This project simulates a basic industrial Programmable Logic Controller (PLC) system using an Arduino Uno.  
 It models machine states (Stopped, Running, Fault) and now **controls a real motor** through a relay.
 
 ![PLC Trainer Setup](docs/plcTrainer_setup.jpg)
@@ -101,12 +101,15 @@ It models machine states (Stopped, Running, Fault) and now **controls a real mot
 
 ## Versioning
 
-- `Phase 3.0.2`  
+- `Phase 3.0.4`  
 - Code includes helper classes, clean state management, and motor relay integration.
+- Added return after transitioning to FAULT to avoid "released early" print.
+- Improved early-release handling and comment clarity.
+
 
 Future Roadmap:
-- Consolidate blinking logic even further.
-- Introduce a `ButtonController` class to cleanly handle all buttons.
+- Add some analog sensors to the circuit: light and temp
+- Port this functionality to OpenPLC
 - Expand system to higher voltages (12V and eventually 24V).
 
 ---
