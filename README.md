@@ -19,7 +19,7 @@ It models machine states (Stopped, Running, Fault) and now **controls a real 12V
 ✅ **Start Button** (Hold 3 seconds to start motor)  
 ✅ **Stop Button** (Hold 3 seconds to stop motor)  
 ✅ **Fault Simulation Button** (Instantly trigger fault)  
-✅ **Motor Relay Control** (Pin 12)  
+✅ **Motor Relay Control**  
 ✅ **Visual LED Feedback**  
 ✅ **Audible Buzzer Feedback**  
 ✅ **Fault Recovery via EEPROM**  
@@ -46,13 +46,13 @@ It models machine states (Stopped, Running, Fault) and now **controls a real 12V
 |:----------|:------|
 | Arduino Uno | Standard AVR |
 | Terminal Breakout Shield | For easier wiring |
-| NeoPixel LED | Data pin 7 |
-| Piezo Buzzer | Pin 8 |
+| NeoPixel LED | 3 pins: 5V, ground and data |
+| Piezo Buzzer | 2 pins: ground and data |
 | 4-Channel Relay Module | 5V type, triggered LOW |
 | 12V DC Motor | Driven by Relay Channel 4 |
 | 12V 10A Power Supply | Powers entire system |
 | 3x Momentary Buttons | Start, Stop, Fault Sim |
-| 3D-Printed Mounting Frame | Optional for neatness |
+| 3D-Printed DIN Rail mounting parts | Optional for neatness |
 
 ---
 
@@ -66,7 +66,7 @@ It models machine states (Stopped, Running, Fault) and now **controls a real 12V
 | D7 | NeoPixel LED (Signal) |
 | D8 | Piezo Buzzer |
 | D12 | Relay Channel 4 (Motor Control) |
-| VIN/GND | Buck converter |
+| VIN/GND | Buck converter + relay + Arduino |
 
 ---
 
@@ -127,4 +127,4 @@ MIT License
 
 ---
 
-**Build smart. Build safe. Build awesome. And above all — have fun! 🚀**
+**Build smart. Build safe. Build awesome. And above all — build fun things! 🚀**
