@@ -1,60 +1,33 @@
-# Phase 3.0.4 – Minor Bug Fix + Enhanced Internal Comments
+# Release Notes
 
-**Release Date:** 2024-04-30  
-**Tag:** `v3.0.4`  
-**Branch:** `phase3-dev`
+## Version 3.0.5 - [2025-05-01]
 
----
+### 🎯 Overview
+This release finalizes the Arduino Uno version of the PLC Trainer project.  
+It focuses primarily on documentation updates to fully reflect the current hardware wiring and system layout.
 
-## ✅ Summary of Changes
+### ✨ Changes
 
-- 🐞 **Bug Fix**  
-  Fixed a logic error where the system would print `"Fault button released early"` even during an actual transition to FAULT.  
-  ✔ Resolved by placing a `return` statement immediately after changing state to FAULT, bypassing further fault button logic for that cycle.
+- Updated `HARDWARE_OVERVIEW.md`:
+  - Added 12V DC Motor entry to hardware requirements
+  - Documented Relay Channel 4 (D12) controlling the motor
+  - Specified Buck Converter supplying power via VIN/GND
+  - Clarified NeoPixel and Piezo functions
 
-- 💬 **Improved Code Comments**  
-  Added detailed, beginner-friendly inline comments throughout the code:
-  - System state explanations
-  - LED and buzzer behavior
-  - Button debounce and hold tracking
-  - EEPROM behavior
-  - State-specific transitions and logic breakdown
+- General documentation cleanup for better clarity and maintainability
+- Confirmed Arduino Uno pin mappings are complete and accurate
+- Minor wording improvements in existing documentation files
 
----
+### 📦 Impact
+- No code logic changes were made
+- Hardware and wiring documentation is now aligned with the current physical trainer
+- This release locks in the Uno-based trainer as a known working baseline
 
-## 🔧 Behavior Overview (Unchanged but Documented)
-
-- **Start/Stop Buttons (3-second hold)**
-  - LED blinks yellow during hold
-  - Green = running, Red = stopped
-  - Console shows `"Start button released early"` if you let go too soon
-
-- **Fault Button**
-  - Immediate fault on press (3 red beeps)
-  - FAULT state triggers motor OFF and fast red LED blink
-  - Hold 5 seconds to clear (slow red blink while holding)
-  - Console prints `"Fault button released early"` if canceled
+### 🛠 Next Steps
+- Create a new Git branch (`nano-rp2040-testing`) to migrate and expand the project to the Arduino Nano RP2040 Connect hardware
+- Maintain the Uno version as the stable reference version moving forward
 
 ---
 
-## 🧪 Testing and Verification
-
-- All tests passed:
-  - Solid and blinking LED behavior
-  - Early release feedback restored
-  - EEPROM restores fault correctly after reset
-  - Relay pin toggles properly
-
----
-
-## 📂 Repository Structure Reminder
-
-- `main.cpp`: Main source file
-- `README.md`: Project overview, wiring guide, image, and feature list
-- `RELEASE_NOTES.md`: This file
-- `platformio.ini`: Board and library config (Arduino Uno, NeoPixel)
-- `docs/`: Media assets (e.g., wiring diagram, project photo)
-
----
-
-**Build safe. Build smart. Build better. And always, build fun things!!**
+**Tag**: `v3.0.5`  
+**Release Date**: 2025-05-01
