@@ -1,0 +1,17 @@
+Arduino Nano RP2040 Connect
+Digital Inputs = 2, 3, 4, 5, 6, 7
+Digital Outputs = 8, 9, 10, 11, 12, 13
+Analog Inputs = A1, A2, A3
+Analog Outputs = 14
+
+Raspberry Pi Pico W
+Digital Inputs = 6, 7, 8, 9, 10, 11, 12, 13
+Digital Outputs = 14, 15, 16, 17, 18, 19, 20, 21
+Analog Inputs = 26, 27, 28
+Analog Outputs = 4, 5
+
+Arduino Nano Every
+Digital Inputs = 2, 3, 4, 5, 6
+Digital Outputs = 7, 8, 10, 11, 12, 13
+Analog Inputs = 15, 16, 17, 18, 19, 20, 21
+Analog Outputs = 9, 14
