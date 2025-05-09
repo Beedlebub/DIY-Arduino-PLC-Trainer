@@ -11,7 +11,23 @@ Analog Inputs = 26, 27, 28
 Analog Outputs = 4, 5
 
 Arduino Nano Every
-Digital Inputs = 2, 3, 4, 5, 6
-Digital Outputs = 7, 8, 10, 11, 12, 13
-Analog Inputs = 15, 16, 17, 18, 19, 20, 21
-Analog Outputs = 9, 14
+Digital Inputs = 2, 3, 4, 5, 6 or %IX0.0 – %IX0.4
+Digital Outputs = 7, 8, 10, 11, 12, 13 or %QX0.0 – %QX0.5
+Analog Inputs = 15, 16, 17, 18, 19, 20, 21 or %IW0 – %IW6
+Analog Outputs = 9, 14 or %QW0 – %QW1
+
+Arduino Uno R3
+Mapping for IO in OpenPLC:
+Digital Inputs = 2, 3, 4, 5, 6 or %IX0.0 – %IX0.4
+Digital Outputs = 7, 8, 12, 13 or %QX0.0 – %QX0.3
+Analog Inputs = A0, A1, A2, A3, A4, A5 or %IW0 – %IW5
+Analog Outputs = 9, 10, 11 or %QW0 – %QW2
+
+Mappings for Input and Output Connections:
+pushButton_start = 2
+pushbutton_stop = 3
+led_green = 7
+led_yellow = 8
+led_red = 12
+Relay 4 trigger = 13
+piezo (with analog for openplc) = 9
